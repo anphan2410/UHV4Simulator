@@ -1,5 +1,5 @@
-#ifndef STRAYSTUFFS_H
-#define STRAYSTUFFS_H
+#ifndef COMMONTHINGS_H
+#define COMMONTHINGS_H
 
 #include <QHash>
 #include <QByteArray>
@@ -45,6 +45,34 @@ const QHash<TN, QString> SwapKeyValOnOneToOneQHash(const QHash<QString, TN> &AQH
     return tmp;
 }
 
+inline static quint8 XORofAllBytesInQByteArr(const QByteArray &QBArr)
+{
+    if (!(QBArr.isNull() || QBArr.isEmpty()))
+    {
+        QByteArray::const_iterator ConstItr = QBArr.constBegin();
+        quint8 IntTmp = *(ConstItr++);
+        for (;ConstItr!=QBArr.cend(); ConstItr++)
+        {
+            IntTmp ^=*ConstItr;
+        }
+        return IntTmp;
+    }
+    else
+        return 0;
+}
+
+///
+/// \brief IntStr2QBArr0Pad
+/// \param Num
+/// \param SizeInByte
+/// \return QByteArray contains a hex number
+///         representing an integer number encoded by Ascii code
+///
+inline static const QByteArray IntStr2QBArr0Pad(const quint32 Num, const quint8 SizeInByte)
+{
+    QString QStrTmp = QString::number(Num);
+    return QStrTmp.prepend(QString("").fill('0',SizeInByte-QStrTmp.size())).toLocal8Bit();
+}
 
 
-#endif // STRAYSTUFFS_H
+#endif // COMMONTHINGS_H

@@ -53,18 +53,33 @@ void UHV4Simulator::work()
                 {
                     currentRead+=SerialPort->readAll();
                 }
-                BinaryProtocol & currentWC = BinaryProtocol::FromQByteArray(currentRead);
+                WindowProtocol & currentWP = WindowProtocol::fromQByteArray(currentRead);
                 anIf(UHV4SimulatorDbgEn,
                      anAck("New Command Received !");
-                     anInfo(currentWC.GetMessageTranslation()););
+                     anInfo(currentWP.getMSGMean()););
                 pendingSend.clear();
-                if (currentWC.GetCommand()=="HVSwitch")
+                if (currentWP.getWINMean().contains("HVOnOff", Qt::CaseInsensitive))
                 {
-                    pendingSend.append(0x06);
+                    if (currentWP.getCOM()==0x31)//WR
+                    {
+                        pendingSend=currentWP.setWIN(0).setDATA(QByteArray().append(0x06)).genMSG();
+                    }
+
                 }
-                else if ((currentWC.GetCommand()=="ReadP")||(currentWC.GetCommand()=="ReadV")||(currentWC.GetCommand()=="ReadI"))
+                else if (currentWP.getWINMean().contains("VMeasured", Qt::CaseInsensitive))
                 {
-                    pendingSend=currentWC.HdrRsp().Data(qrand()%0xff).GenMsg();
+                    if (currentWP.getCOM()==0x30)//RD
+                        pendingSend=currentWP.setDATA(IntStr2QBArr0Pad(qrand()%10000,6)).genMSG();
+                }
+                else if (currentWP.getWINMean().contains("IMeasured", Qt::CaseInsensitive))
+                {
+                    if (currentWP.getCOM()==0x30)//RD
+                        pendingSend=currentWP.setDATA(QString(QString::number(quint8(qrand()%9))+"E-"+QString::number(quint8(qrand()%10))).toUpper().toLocal8Bit()).genMSG();
+                }
+                else if (currentWP.getWINMean().contains("PMeasured", Qt::CaseInsensitive))
+                {
+                    if (currentWP.getCOM()==0x30)//RD
+                        pendingSend=currentWP.setDATA(QString(QString::number(quint8(qrand()%9))+"."+QString::number(quint8(qrand()%9))+"E-"+QString::number(quint8(qrand()%99))).toUpper().toLocal8Bit()).genMSG();
                 }
                 isTimedOut=false;
                 timer.start();
@@ -87,8 +102,8 @@ void UHV4Simulator::work()
                 }
                 else
                 {
-                    anIf(UHV4SimulatorDbgEn, anWarn("Invalid Command Transmission !"));
-                    SerialPort->write(QByteArray().append(0x15));
+                    anIf(UHV4SimulatorDbgEn, anWarn("Invalid Command Transmission !"));                    
+                    SerialPort->write(currentWP.setWIN(0).setDATA(QByteArray().append(0x15)).genMSG());
                 }
                 isValid = true;
             }

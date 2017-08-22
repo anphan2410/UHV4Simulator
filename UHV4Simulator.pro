@@ -10,8 +10,8 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    windowcommand.cpp \
-    uhv4simulator.cpp
+    uhv4simulator.cpp \
+    windowprotocol.cpp
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings
@@ -27,5 +27,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 HEADERS += \
     anlogger.h \
     commonthings.h \
-    windowcommand.h \
-    uhv4simulator.h
+    uhv4simulator.h \
+    windowprotocol.h

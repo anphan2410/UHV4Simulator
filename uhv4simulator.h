@@ -8,8 +8,9 @@
 #include <QSerialPort>
 #include <QByteArray>
 #include <QTimer>
-#include "windowcommand.h"
 #include "anlogger.h"
+#include "windowprotocol.h"
+
 
 class UHV4Simulator : public QObject
 {
